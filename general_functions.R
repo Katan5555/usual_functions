@@ -38,6 +38,8 @@ percent <- function(x, digits = 0, format = "f", ...) {
 
 # lapply( df_list, "[", , names )  # extract specific columns from a list of data frames
 
+# dir.create(file.path(result_folder), recursive = T, showWarnings = F)
+
 
 progeny <- function(GEX) {
   model <- data.matrix( read.csv("/Users/miyang/Documents/PrognomIQ/GENERAL_DATA/model_14PW.csv", row.names=1) )
@@ -343,6 +345,30 @@ binarize_columns <- function(mat,column, th, binary=F) {
   return(mat)
 }
 
+# mat=clinical ; column=1 ; th=0.3 ; binary=F
+binarize_columns_reduce <- function(mat,column, th, binary=F) {
+  # here th mean take top X% or down X%
+  for(i in column ){ # i=1
+    limit_down <- quantile(mat[ ,i], th)
+    limit_up <- quantile(mat[ ,i], 1-th )
+    
+    mat[ ,i][mat[ ,i]<=limit_down]  <- "low" 
+    mat_down <- mat[ mat[ ,i] == "low" , ]
+    
+    mat <- mat[ mat[ ,i] != "low" , ]
+    
+    mat[ ,i][mat[ ,i]>=limit_up]  <- "high" 
+    mat_high <- mat[ mat[ ,i] == "high" , ]
+    
+    mat = rbind(mat_high,mat_down)
+    
+  }
+  if(binary==T) {
+    mat[mat=="high"] <- 1
+    mat[mat=="low" ] <- 0
+  }
+  return(mat)
+}
 
 convert_pathway <- function(GEX,geneset_name,N_core=1) {
   library(GSVA) ; library(GSA)
