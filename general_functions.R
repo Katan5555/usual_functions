@@ -29,6 +29,8 @@ percent <- function(x, digits = 0, format = "f", ...) {
 ## df <- matrix(as.numeric(df),ncol = ncol(df))
 
 ###### from table to matrix
+# makes sure there is no duplicates first.
+# mat_table_unique <- mat_table[!duplicated(mat_table[c(1,2,3)]),] # columns 1,2,3 correspond to value, ind, Var1
 # df <- xtabs(value ~ ind + Var1, mat_table)
 # df <-  as.data.frame.matrix(df)
 
