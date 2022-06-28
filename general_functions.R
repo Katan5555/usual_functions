@@ -49,9 +49,18 @@ progeny <- function(GEX) {
   GEX <- GEX[common, ]
   model <- model [common, ]
   PROGENy <- t(GEX) %*% model
-  return(PROGENy)
+  return(t(PROGENy))
 }
 
+ssGSEA <-function(GEX, genesets) {
+  #################################### ssGSEA ####################################
+  library(GSVA) ; library(GSA)
+  # canonical_pathway_1329  immunologic_signatures_1888
+  MSigDB <- GSA.read.gmt(paste0(path,"/GENERAL_DATA/MSigDB/",genesets,".gmt"))
+  geneSets <- MSigDB$genesets ; names(geneSets) <- MSigDB$geneset.names
+  GEX_ssGSEA <- t(gsva(data.matrix(t(GEX)), geneSets, method="ssgsea", verbose=FALSE, parallel.sz=4))
+  return(GEX_ssGSEA)
+}
 
 remove_string <- function(string) {
   library(stringr)
