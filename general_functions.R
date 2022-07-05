@@ -38,10 +38,48 @@ percent <- function(x, digits = 0, format = "f", ...) {
 # from Uniprot to HGNC 
 # library(AbHAC) ; uniprot.to.hgnc(uniprot, id.con.set = id.conversion.set)
 
+###### list of dataframes
 # lapply( df_list, "[", , names )  # extract specific columns from a list of data frames
 
+###### count Missing/Specific values in dataframe
+# NA_per_row <- rowSums(is.na(df) | df == "")  # NA per row in df 
+
+###### Directories
 # dir.create(file.path(result_folder), recursive = T, showWarnings = F)
 
+###### Divers
+# split vector into chunks of 5
+# split(my_vec, ceiling(seq_along(my_vec) / 5))
+
+# library(impute) : GEX_knn <- impute.knn(data.matrix(GEX),k = 10)$data
+
+## add specific numbers to each row
+#mat <- matrix(1:15, nrow=5)
+#sweep(mat, 1, c(5, 10, 15, 20, 25), "+")
+
+convert_ENS_HGNC_df_row <- function(df) {
+  conversion_table <- read.csv("/Users/i0535027/Documents/Sanofi/ID_CONVERSION/table_conversion_ENS_HGNC_ENTREZ.txt",sep="\t")
+  conversion_table <- conversion_table[conversion_table$Ensembl.Gene.ID %in% rownames(df), ]
+  df <- df[conversion_table$Ensembl.Gene.ID, ]
+  rownames(df) <- conversion_table$Approved.Symbol
+  return(df)
+}
+
+convert_ENTREZ_HGNC_df_row <- function(df) {
+  conversion_table <- read.csv("/Users/i0535027/Documents/Sanofi/ID_CONVERSION/table_conversion_ENS_HGNC_ENTREZ.txt",sep="\t")
+  conversion_table <- conversion_table[conversion_table$Entrez.Gene.ID %in% rownames(df), ]
+  df <- df[conversion_table$Entrez.Gene.ID, ]
+  rownames(df) <- conversion_table$Approved.Symbol
+  return(df)
+}
+
+convert_protein_product_df_row <- function(df) {
+  HGNC_gene_with_protein_product <- read.delim("/Users/i0535027/Documents/Sanofi/ID_CONVERSION/HGNC_gene_with_protein_product.txt")
+  common <- intersect(rownames(df),HGNC_gene_with_protein_product$symbol)
+  HGNC_gene_with_protein_product <- HGNC_gene_with_protein_product[HGNC_gene_with_protein_product$symbol %in% common , ]
+  df <- df[HGNC_gene_with_protein_product$symbol , ]
+  return(df)
+}
 
 progeny <- function(GEX) {
   model <- data.matrix( read.csv("/Users/miyang/Documents/PrognomIQ/GENERAL_DATA/model_14PW.csv", row.names=1) )
@@ -179,7 +217,12 @@ ENS_to_Hugo <- function(gene) {
   return(hgnc)
 }
 
-  
+get_ensembl_table <- function() {
+  library(biomaRt)
+  ensembl <- useMart("ensembl", dataset="hsapiens_gene_ensembl")
+  mapTab <- getBM(attributes = c("ensembl_gene_id","description","hgnc_symbol"),mart = ensembl, uniqueRows=FALSE) # listAttributes(ensembl)
+  return(mapTab)
+}
 
 corr_by_row <- function(mat1, mat2, method="pearson")  {
   mat1 <- as.matrix(mat1)
