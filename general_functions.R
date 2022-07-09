@@ -58,7 +58,7 @@ percent <- function(x, digits = 0, format = "f", ...) {
 #sweep(mat, 1, c(5, 10, 15, 20, 25), "+")
 
 convert_ENS_HGNC_df_row <- function(df) {
-  conversion_table <- read.csv("/Users/i0535027/Documents/Sanofi/ID_CONVERSION/table_conversion_ENS_HGNC_ENTREZ.txt",sep="\t")
+  conversion_table <- read.csv("/ID_CONVERSION/table_conversion_ENS_HGNC_ENTREZ.txt",sep="\t")
   conversion_table <- conversion_table[conversion_table$Ensembl.Gene.ID %in% rownames(df), ]
   df <- df[conversion_table$Ensembl.Gene.ID, ]
   rownames(df) <- conversion_table$Approved.Symbol
@@ -66,7 +66,7 @@ convert_ENS_HGNC_df_row <- function(df) {
 }
 
 convert_ENTREZ_HGNC_df_row <- function(df) {
-  conversion_table <- read.csv("/Users/i0535027/Documents/Sanofi/ID_CONVERSION/table_conversion_ENS_HGNC_ENTREZ.txt",sep="\t")
+  conversion_table <- read.csv("/ID_CONVERSION/table_conversion_ENS_HGNC_ENTREZ.txt",sep="\t")
   conversion_table <- conversion_table[conversion_table$Entrez.Gene.ID %in% rownames(df), ]
   df <- df[conversion_table$Entrez.Gene.ID, ]
   rownames(df) <- conversion_table$Approved.Symbol
@@ -74,7 +74,7 @@ convert_ENTREZ_HGNC_df_row <- function(df) {
 }
 
 convert_protein_product_df_row <- function(df) {
-  HGNC_gene_with_protein_product <- read.delim("/Users/i0535027/Documents/Sanofi/ID_CONVERSION/HGNC_gene_with_protein_product.txt")
+  HGNC_gene_with_protein_product <- read.delim("/ID_CONVERSION/HGNC_gene_with_protein_product.txt")
   common <- intersect(rownames(df),HGNC_gene_with_protein_product$symbol)
   HGNC_gene_with_protein_product <- HGNC_gene_with_protein_product[HGNC_gene_with_protein_product$symbol %in% common , ]
   df <- df[HGNC_gene_with_protein_product$symbol , ]
@@ -82,7 +82,7 @@ convert_protein_product_df_row <- function(df) {
 }
 
 progeny <- function(GEX) {
-  model <- data.matrix( read.csv("/Users/miyang/Documents/PrognomIQ/GENERAL_DATA/model_14PW.csv", row.names=1) )
+  model <- data.matrix( read.csv("/GENERAL_DATA/model_14PW.csv", row.names=1) )
   common <- intersect( rownames(GEX) , rownames(model) ) 
   GEX <- GEX[common, ]
   model <- model [common, ]
